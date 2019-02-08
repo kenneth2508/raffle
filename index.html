@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html >
+  <head>
+    <meta charset="UTF-8">
+    <title>Random Name Shuffler</title>
+    <meta name="viewport" content="width=device-width">
+    
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/jqueryui.css">
+	<link rel="stylesheet" href="css/swal.css">
+    <style>
+	@font-face {
+	  font-family: 'Londrina Solid';
+	  font-style: normal;
+	  font-weight: 400;
+	  src: local('Londrina Solid Regular'), local('LondrinaSolid-Regular'), 
+	  url(fonts/font.woff2) format('woff2'),
+	  url(fonts/font.ttf) format('truetype');
+	  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
+	}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  background: #323232;
+}
+
+a {
+  color: #53BDFF;
+  text-decoration: none;
+  font-size: 14px;
+  
+  transition: .2s;
+}
+a:hover {
+
+  color: #ffb853 !important;
+}
+
+.hangman {
+  font-family: "Londrina Solid", cursive;
+  margin: 0 auto;
+  text-align: center;
+  padding: 10px;
+}
+
+h1 {
+  font-size: 50px;
+  margin-bottom: 20px;
+  color: #53BDFF;
+  font-weight: 300;
+}
+
+p {
+  margin-bottom: 20px;
+  color: gray;
+  line-height: 1.3;
+}
+
+@keyframes letteranim {
+  50% {
+    transform: translateY(-5px) scale(1.05);
+  }
+}
+.letter {
+  display: inline-block;
+  color: transparent;
+  border-bottom: 5px solid #53BDFF;
+  margin: 0 10px;
+  font-size: 50px;
+  padding: 10px;
+  transition: .5s;
+  text-transform: uppercase;
+}
+
+.word {
+  display: block;
+  white-space: nowrap;
+}
+
+.correct {
+  color: #53BDFF;
+  text-shadow: 1px 2px 0 #20a9ff;
+  animation: letteranim .3s ease;
+}
+
+.guessForm {
+  margin: 20px auto 0;
+}
+.guessForm input, .guessForm .guessButton, .guessButtonReset, textarea {
+  font-family: "Londrina Solid", cursive;
+}
+.guessForm textarea {
+  outline: none;
+  padding: 10px;
+  font-size: 20px;
+  margin-bottom: 20px;
+  margin-right: 5px;
+  border: 1px solid #aaa;
+  color: gray;
+}
+.guessForm .guessButton {
+  border: none;
+  font-size: 30px;
+  padding: 10px 20px;
+  cursor: pointer;
+  background: #53BDFF;
+  color: white;
+  transition: .3s;
+  margin: 10px 0;
+}
+.guessForm .guessButton:hover {
+  background: #20a9ff;
+}
+
+.wrongLetters {
+  font-size: 20px;
+}
+.wrongLetters p {
+  margin-bottom: 10px;
+}
+.wrongLetters li {
+  display: inline-block;
+  font-size: 40px;
+  background: #ff4d4d;
+  text-shadow: 1px 2px 0 red;
+  padding: 10px;
+  color: white;
+  text-transform: uppercase;
+  margin-right: 10px;
+  animation: letteranim .3s ease;
+}
+
+.message {
+  display: none;
+  padding: 20px;
+  position: absolute;
+  top: 110px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  /*   height: 100%; */
+  background: #0091ec;
+  z-index: 12402402;
+}
+.message h1 {
+  display: none;
+  color: white;
+  text-shadow: 1px 2px 0 #ccc;
+}
+.message .highlight {
+  color: yellow;
+  text-transform: capitalize;
+}
+.message .text {
+  color: white;
+  font-size: 30px;
+  display: none;
+}
+.message .text p {
+  color: white;
+}
+.message .text .highlight {
+  font-size: 40px;
+}
+.message .muted {
+  margin: 20px auto;
+  color: #86d1ff;
+}
+
+.button {
+  display: none;
+  margin: 10px 0;
+  border: none;
+  font-size: 30px;
+  padding: 10px 20px;
+  cursor: pointer;
+  background: #34cd39;
+  color: white;
+  transition: .3s;
+  text-shadow: 1px 2px 0 #2EB933;
+  font-family: "Londrina Solid", cursive;
+}
+.button:hover {
+  background: #71dc75;
+}
+
+.showTable{
+margin: 20px auto 0;
+width: 700px;
+}
+.showTable td{
+border: 1px solid white; 
+color: white;
+font-size:30px;
+padding: 10px;
+
+text-align: left;
+    max-width: 700px;
+    min-width: 150px;
+    word-wrap: break-word;
+}
+
+#butClr{
+display:none;
+}
+
+.guessButtonReset{
+
+border: none;
+  font-size: 30px;
+  padding: 10px 20px;
+  cursor: pointer;
+  background: #f74d4e;
+  color: white;
+  transition: .3s;
+  margin: 10px 0;
+}
+    </style>
+
+    
+        <script src="js/prefixfree.min.js"></script>
+        
+
+
+      
+  </head>
+
+  <body>
+
+	
+    <div class="hangman"><br>
+	<div style="text-align:left;">
+	<a href="../index.html" style="font-size:50px;color: #53BDFF;">Home</a> &nbsp;&nbsp;&nbsp; <span style="font-size:50px;color: #FFFFFF;">|</span>&nbsp;&nbsp;&nbsp;
+	<a href="#" style="font-size:50px;color: #ffb853;">Create</a> &nbsp;&nbsp;&nbsp;
+	<a href="raffle.html" style="font-size:50px;color: #53BDFF;">Play</a>
+	</div>	
+	<div class="guessForm">
+<textarea id="t1" placeholder="RAFFLE IDENTIFIERS" class="guessLetter"  style="width:300px;" autofocus ></textarea> 
+<textarea id="t2" placeholder="RAFFLE ENTRIES" type="text" class="guessLetter" style="width:500px;"></textarea> <br>
+<button id="myBtn" type="submit" class="guessButton" onClick="checkinput()">Add</button>
+<button id = "butClr" type="submit" class="guessButtonReset" onClick="remove_storage()" ><b>Reset</button>
+
+
+</div>
+
+<table id="disp" class="showTable">
+</table>
+
+</div>
+
+<script src="js/create.js"></script>
+<script src="js/jquery2.1.3.js"></script>
+<script src="js/jqueryui.js"></script>
+
+    
+    <script>
+/*	
+	SUBMIT WHEN ENTER IS PRESSED
+	var input = document.getElementById("t2");
+	input.addEventListener("keyup", function(event) {
+	  event.preventDefault();
+	  if (event.keyCode === 13) {
+		document.getElementById("myBtn").click();
+	  }
+	});
+		
+	$(function() {
+    $('#t1').on('keypress', function(e) {
+        if (e.which == 32 )
+            return false;
+    });
+});*/
+
+  var isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
+    if(!isChrome){
+      $('#iframeAudio').remove()
+    }
+  else{
+     $('#playAudio').remove() //just to make sure that it will not have 2x audio in the background 
+  }
+
+function checkinput(){
+if ( document.getElementById('t1').value == "" || document.getElementById('t2').value == ""){
+		swal({
+  title: "Ooopss!",
+  text: "Make sure you have an IDENTIFIER AND an ENTRY.",
+  type: "warning",
+  showCancelButton: false,
+  confirmButtonClass: "btn btn-danger btn-lg",
+  confirmButtonText: "Sorry, thank you for reminding!",
+  closeOnConfirm: true
+});
+	}
+else{
+add_element();
+}
+}
+
+var test = localStorage.getItem("ahente");
+var testhints = localStorage.getItem("schools");
+var testhints2 = JSON.parse(testhints);
+
+var arrayy = test.split(',');
+
+console.log(testhints2);
+
+
+var str='';
+var counter = arrayy.length;
+for (i=0;i<counter;i++) 
+{ 
+str +=  "<tr><td>" + arrayy[i] + "</td>";  // adding each element with key number to variable
+str += "<td style='color:gray;'>" + testhints2[i] + "</td></tr>";  // adding each element with key number to variable
+} 
+
+if(counter>0){
+document.getElementById('disp').innerHTML=str; // Display the elements of the array
+document.getElementById('butClr').style.display="inline"; // Display the elements of the array
+}
+
+
+
+function remove_storage(){
+localStorage.clear();
+location.reload();
+}
+
+
+</script>
+    <script src="js/swal.js"></script>
+  </body>
+</html>

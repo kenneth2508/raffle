@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html >
+  <head>
+    <meta charset="UTF-8">
+    <title>Random Name Shuffler</title>
+    <meta name="viewport" content="width=device-width">
+    
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/jqueryui.css">
+	<link rel="stylesheet" href="css/animate.css">
+	<link rel="stylesheet" href="css/swal.css">
+    <style>
+	@font-face {
+	  font-family: 'Londrina Solid';
+	  font-style: normal;
+	  font-weight: 400;
+	  src: local('Londrina Solid Regular'), local('LondrinaSolid-Regular'), 
+	  url(fonts/font.woff2) format('woff2'),
+	  url(fonts/font.ttf) format('truetype');
+	  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
+	}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  background: #323232;
+}
+
+a {
+  color: #53BDFF;
+  text-decoration: none;
+  font-size: 14px;
+  
+  transition: .2s;
+}
+a:hover {
+
+  color: #ffb853 !important;
+}
+
+.hangman {
+  font-family: "Londrina Solid", cursive;
+  margin: 0 auto;
+  text-align: center;
+  padding: 10px;
+}
+
+h1 {
+  font-size: 50px;
+  margin-bottom: 20px;
+  color: #53BDFF;
+  font-weight: 300;
+}
+
+p {
+  margin-bottom: 20px;
+  color: gray;
+  line-height: 1.3;
+}
+
+@keyframes letteranim {
+  50% {
+    transform: translateY(-5px) scale(1.05);
+  }
+}
+.letter {
+  display: inline-block;
+  color: transparent;
+  border-bottom: 5px solid #53BDFF;
+  margin: 0 10px;
+  font-size: 50px;
+  padding: 10px;
+  transition: .5s;
+  text-transform: uppercase;
+}
+
+.word {
+  display: block;
+  white-space: nowrap;
+}
+
+.correct {
+  color: #53BDFF;
+  text-shadow: 1px 2px 0 #20a9ff;
+  animation: letteranim .3s ease;
+}
+
+.guessForm {
+  margin: 20px auto 0;
+}
+.guessForm input, .guessForm .guessButton, .guessButtonReset {
+  font-family: "Londrina Solid", cursive;
+}
+.guessForm input[type="text"] {
+  outline: none;
+  padding: 10px;
+  font-size: 30px;
+  margin-bottom: 20px;
+  margin-right: 5px;
+  border: 1px solid #aaa;
+  color: gray;
+}
+.guessForm .guessButton {
+  border: none;
+  font-size: 30px;
+  padding: 10px 20px;
+  cursor: pointer;
+  background: #53BDFF;
+  color: white;
+  transition: .3s;
+  margin: 10px 0;
+}
+.guessForm .guessButton:hover {
+  background: #20a9ff;
+}
+
+.wrongLetters {
+  font-size: 20px;
+}
+.wrongLetters p {
+  margin-bottom: 10px;
+}
+.wrongLetters li {
+  display: inline-block;
+  font-size: 40px;
+  background: #ff4d4d;
+  text-shadow: 1px 2px 0 red;
+  padding: 10px;
+  color: white;
+  text-transform: uppercase;
+  margin-right: 10px;
+  animation: letteranim .3s ease;
+}
+
+.message {
+  display: none;
+  padding: 20px;
+  position: absolute;
+  top: 110px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  /*   height: 100%; */
+  background: #0091ec;
+  z-index: 12402402;
+}
+.message h1 {
+  display: none;
+  color: white;
+  text-shadow: 1px 2px 0 #ccc;
+}
+.message .highlight {
+  color: yellow;
+  text-transform: capitalize;
+}
+.message .text {
+  color: white;
+  font-size: 30px;
+  display: none;
+}
+.message .text p {
+  color: white;
+}
+.message .text .highlight {
+  font-size: 40px;
+}
+.message .muted {
+  margin: 20px auto;
+  color: #86d1ff;
+}
+
+.button {
+  display: none;
+  margin: 10px 0;
+  border: none;
+  font-size: 30px;
+  padding: 10px 20px;
+  cursor: pointer;
+  background: #34cd39;
+  color: white;
+  transition: .3s;
+  text-shadow: 1px 2px 0 #2EB933;
+  font-family: "Londrina Solid", cursive;
+}
+.button:hover {
+  background: #71dc75;
+}
+
+.showTable{
+margin: 20px auto 0;
+width: 700px;
+text-align: center;
+}
+.showTable td{
+color: white;
+font-size:30px;
+padding: 10px;
+text-align: center;
+    max-width: 700px;
+    min-width: 150px;
+    word-wrap: break-word;
+}
+
+#butClr{
+display:none;
+}
+
+.guessButtonReset{
+
+border: none;
+  font-size: 30px;
+  padding: 10px 20px;
+  cursor: pointer;
+  background: #f74d4e;
+  color: white;
+  transition: .3s;
+  margin: 10px 0;
+}
+.sa-button-container .cancel{
+  border: none;
+  font-size: 30px;
+  padding: 10px 20px;
+  cursor: pointer;
+  background-color: #ec4242 !important;
+  color: white;
+  transition: .3s;
+  margin: 10px 0;
+  
+  font-family: "Londrina Solid", cursive;
+}
+.sa-button-container .confirm{
+	border: none;
+  font-size: 30px;
+  padding: 10px 20px;
+  cursor: pointer;
+  background-color: #8cd4f5 !important;
+  color: white;
+  transition: .3s;
+  margin: 10px 0;
+  
+  font-family: "Londrina Solid", cursive;
+
+}
+
+
+.wrapper {
+}
+
+.box {
+	padding: 9em;
+	position: relative;
+	overflow: hidden;
+	font-size:30px;
+	text-align: center;
+    word-wrap: break-word;
+	color: white;
+}
+
+
+.scroll {
+
+	position: absolute;
+	align: center;
+	top: 0%;
+	/*-webkit-animation: scroll 15s linear infinite;
+	-moz-animation: scroll 15s linear infinite;
+	-ms-animation: scroll 15s linear infinite;
+	-o-animation: scroll 15s linear infinite;
+	animation: scroll 10s linear infinite; */
+}
+
+
+
+
+    </style>
+
+    
+        <script src="js/prefixfree.min.js"></script>
+
+    
+  </head>
+  
+  <body onload = "preSHUFFLE()">
+	<audio id="bgsound"  autoplay loop>
+	  <source src="sounds/bg.mp3" type="audio/mpeg">
+	  Your browser does not support the audio tag.
+	</audio>
+	
+	<audio id="winnerSound"  loop>
+	  <source src="sounds/audioWINNER.mp3" type="audio/mpeg">
+	  Your browser does not support the audio tag.
+	</audio>
+
+
+    <div class="hangman"><br>
+	<div style="text-align:left;">
+	<a href="../index.html" style="font-size:50px;color: #53BDFF;">Home</a> &nbsp;&nbsp;&nbsp; <span style="font-size:50px;color: #FFFFFF;">|</span>&nbsp;&nbsp;&nbsp;
+	<a href="index.html" style="font-size:50px;color: #53BDFF;">Create</a> &nbsp;&nbsp;&nbsp;
+	<a href="#" style="font-size:50px;color: #ffb853;">Play</a>
+	</div>	
+	<div class="guessForm"><br>
+<input id="t1" placeholder="AGENT" type="hidden" class="guessLetter" style="width:200px;" autofocus /> 
+<input id="t2" placeholder="SCHOOL" type="hidden" class="guessLetter" style="width:500px;" /> 
+<button id="myBtn" type="submit" class="guessButton" onClick="animationslidingup()">Go</button>
+<!--button id="myBtn2" type="submit" class="guessButton" onClick="animationslidingup()">animation</button-->
+
+  
+  <div class="box"><!-- Div that will hold the UL -->
+   <div class="scroll" >
+   
+     <ul id="disp" style="list-style: none;">
+			
+     </ul>
+     
+   </div>
+  </div><!-- End Box -->
+  
+
+
+
+
+</div>
+
+
+
+</div>
+
+<script src="js/create.js"></script>
+<script src="js/jquery2.1.3.js"></script>
+<script src="js/jqueryui.js"></script>
+    
+    <script>
+
+	
+//getting the arrays from localstorage
+var testhints = localStorage.getItem("schools");
+var testhints2 = JSON.parse(testhints);
+
+var test = localStorage.getItem("ahente");
+var arrayy = test.split(',');
+
+
+var ahentes = test.split(',');
+var winningIndexes = [];
+var deletedArraySchools = [];
+var deletedArrayAhente = [];
+
+
+//displaying values from database
+var str='';
+var counter = arrayy.length;
+for (i=0;i<counter;i++) 
+{ 
+str += "<li>" + testhints2[i] + "</li>";  // adding each element with key number to variable
+} 
+if(counter>0){
+document.getElementById('disp').innerHTML=str; // Display the elements of the array
+}
+
+
+
+function checkinput(){
+
+			var test = localStorage.getItem("schools");
+			if ( test == null ){
+					swal({
+			  title: "No ENTRIES detected.",
+			  allowEscapeKey: false,
+			  type: "warning",
+			  confirmButtonText: "Add entry",
+			  closeOnConfirm: true
+			},
+			function(){
+			  window.location = "index.html";
+			});
+			}
+			
+}
+
+
+function preSHUFFLE(){
+
+			var counterlangpo = 0;
+			
+			
+			var ahentesCollate = ahentes.filter((v,i) => ahentes.indexOf(v) === i);
+			var indexAhentes = Object.keys(ahentes);
+			for (var aa in ahentesCollate){
+			var divideAgents = []; //container of divided indexes
+			for(var xx in ahentes){
+			if(ahentes[xx]==ahentesCollate[aa]){
+			divideAgents.push(xx);
+			}
+			}
+
+			var winner = divideAgents[Math.floor(Math.random() * divideAgents.length)];
+			var winnerName = testhints2[winner];
+			winningIndexes.push(winnerName);
+			
+			}
+				
+
+					
+var bem = localStorage.getItem("winningSchools");
+if(bem == null){
+localStorage.setItem("winningSchools",winningIndexes);
+localStorage.setItem("counterlang",counterlangpo);
+localStorage.setItem("counterlangWinners",winningIndexes.length);
+}
+else{
+console.log("pasok");
+}
+
+
+}
+  
+  
+function animationslidingup(){
+
+
+
+(function(){
+
+function scroller() {
+
+  var scroll = $('div.scroll');// Sets the div with a class of scroll as a variable
+  
+  var height = scroll.height(); // Gets the height of the scroll div
+  
+  var topAdj = -height-30; /* '-height' turns the height                   of the UL into a negative #, 
+               * '- 50' subtracts an extra 50 pixels from the height of 
+        			 * the div so that it moves the trail of the UL higher to 
+							 * the top of the div before the animation                ends
+							 */
+	
+	scroll.animate({
+		'top' : [topAdj, 'linear'] 
+	}, 100, function(){
+		scroll.css('top', 80); //resets the top position of the Ul for the next cycle
+		scroller(); // Recalls the animation cycle to begin.
+	});}
+	
+scroller();
+
+})();
+ 
+ setTimeout(function(){
+ $('div.scroll').hide();
+ 
+ setTimeout(function(){
+ checkifDone(); },200);
+ 
+ }, 3000);
+
+			
+	
+			 }
+
+ 
+function checkifDone(){
+
+
+
+var schoolWinnersCount = localStorage.getItem("counterlangWinners");
+var clickCount = localStorage.getItem("counterlang");
+
+console.log(clickCount);
+console.log(schoolWinnersCount);
+if(clickCount == schoolWinnersCount){
+					
+					localStorage.clear();
+					localStorage.setItem("ahente",ahentes);
+					localStorage.setItem("schools",JSON.stringify(testhints2));
+					aa = 0;
+					xx = 0;
+					location.reload();
+					//checkifDone();
+
+}
+else{
+lastnato();
+}
+
+} 
+
+
+ 
+function lastnato(){
+var winnerSound = document.getElementById("winnerSound"); 
+
+
+winnerSound.play(); 
+checkinput();
+
+var lastnatalagato = localStorage.getItem("winningSchools");
+
+var xxx = localStorage.getItem("counterlang");
+
+var winSchool = lastnatalagato.split(',');
+var winnernato = winSchool[xxx];
+
+
+			swal({
+				  title: winnernato,
+				  allowEscapeKey: false,
+				  type: "success",
+				  showCancelButton: true,
+				  confirmButtonText: "Remove from list",
+				  closeOnConfirm: true
+				},
+				function(){
+				
+
+						//console.log(testhints2)
+						var index = testhints2.indexOf(winnernato);
+						if (index > -1) {
+						  testhints2.splice(index, 1);
+						  ahentes.splice(index, 1);
+						  
+						}
+					
+					
+					//console.log(testhints2);
+					//console.log(ahentes);
+					
+					localStorage.clear();
+					localStorage.setItem("ahente",ahentes);
+					localStorage.setItem("schools",JSON.stringify(testhints2));
+					localStorage.setItem("winningSchools",winSchool);
+					
+					localStorage.setItem("counterlangWinners",winSchool.length);
+					localStorage.setItem("counterlang",xxx);
+					location.reload();
+					
+				});
+				
+				
+				$('.sa-button-container .cancel').click(function(){
+                location.reload();
+				});
+					
+					xxx++;
+					localStorage.clear();
+					localStorage.setItem("ahente",ahentes);
+					localStorage.setItem("schools",JSON.stringify(testhints2));
+					localStorage.setItem("winningSchools",winSchool);
+					
+					localStorage.setItem("counterlangWinners",winSchool.length);
+					localStorage.setItem("counterlang",xxx);
+					
+				
+}
+</script>
+    <script src="js/swal.js"></script>
+  </body>
+</html>
